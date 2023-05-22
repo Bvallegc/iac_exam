@@ -1,33 +1,28 @@
-name: CI/CD
+name: Azure Bicep Infra
 
-on:
-  push:
-    branches:
-      - main
-      - dev
+on: [push, workflow_dispatch]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
 
-      - name: Build and validate Bicep files
-        run: docker run --rm -v ${{ github.workspace }}:/workspace microsoft/bicep build /workspace/main.bicep
+      # Checkout code
+    - uses: actions/checkout@main
 
-  deploy:
-    needs: build
+      # Lint Bicep code 
+    - name: Run Bicep linter
+      run: az bicep build --file ./main.bicep
+
+  deploy-dev:
+    if: github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
+    needs: build
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Deploy Bicep template
-        env:
-          MYSECRET: ${{ secrets.MYSECRET }}
-        run: |
-          docker run --rm -v ${{ github.workspace }}:/workspace microsoft/bicep build /workspace/main.bicep
+      # Checkout code
+    - uses: actions/checkout@main
+    
+      # Log into Azure
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.MYSECRET }}
