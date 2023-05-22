@@ -32,13 +32,3 @@ jobs:
         with:
           inlineScript: |
             # Add the necessary deployment commands here using Azure CLI and Bicep
-
-protection:
-  branches:
-    main:
-        required_pull_request_reviews:
-          dismiss_stale_reviews: true
-          require_code_owner_reviews: true
-        required_status_checks:
-          - enforce_admins
-          - require_signed_commits
