@@ -1,5 +1,4 @@
-name: CI/CD
-
+name: Build and Deploy
 on:
   push:
     branches:
@@ -9,31 +8,37 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Bicep
-        uses: azure/setup-bicep@v1
-
-      - name: Build and validate Bicep files
-        run: bicep build main.bicep
+      # Add steps to build your code here
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Bicep
+      - name: Set up Azure Bicep
         uses: azure/setup-bicep@v1
 
-      - name: Deploy Bicep template
+      - name: Deploy to Azure
+        uses: azure/CLI@v1
         env:
           MYSECRET: ${{ secrets.MYSECRET }}
-        run: |
-          bicep build main.bicep
+        with:
+          inlineScript: |
+            # Add the necessary deployment commands here using Azure CLI and Bicep
+
+branches:
+  main:
+    protection:
+      required_pull_request_reviews:
+        dismiss_stale_reviews: true
+        require_code_owner_reviews: true
+      required_status_checks:
+        - enforce_admins
+        - require_signed_commits
