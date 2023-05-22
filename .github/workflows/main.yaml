@@ -16,7 +16,7 @@ jobs:
 
       - name: Build and validate Bicep files
         run: |
-          docker run --rm -v ${{ github.workspace }}:/workspace mcr.microsoft.com/azure-cli/bicep:latest build /workspace/main.bicep
+          docker run --rm -v ${{ github.workspace }}:/workspace Azure/bicep build /workspace/main.bicep
 
   deploy:
     needs: build
@@ -31,4 +31,4 @@ jobs:
         env:
           MYSECRET: ${{ secrets.MYSECRET }}
         run: |
-          docker run --rm -v ${{ github.workspace }}:/workspace mcr.microsoft.com/azure-cli/bicep:latest az deployment group create --resource-group <resource-group-name> --template-file /workspace/main.json --parameters /workspace/parameters.json
+            docker run --rm -v ${{ github.workspace }}:/workspace Azure/bicep az deployment group create --resource-group <resource-group-name> --template-file /workspace/main.json --parameters /workspace/parameters.json
