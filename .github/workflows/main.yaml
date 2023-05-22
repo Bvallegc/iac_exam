@@ -1,34 +1,28 @@
-name: Build and Deploy
-on:
-  push:
-    branches:
-      - main
-      - dev
+name: Azure Bicep Infra
+
+on: [push, workflow_dispatch]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
 
-      # Add steps to build your code here
+      # Checkout code
+    - uses: actions/checkout@main
 
-  deploy:
-    needs: build
-    if: github.ref == 'refs/heads/main'
+      # Lint Bicep code 
+    - name: Run Bicep linter
+      run: az bicep build --file ./main.bicep
+
+  deploy-dev:
+    if: github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
+    needs: build
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Azure Bicep
-        uses: azure/setup-bicep@v1
-
-      - name: Deploy to Azure
-        uses: azure/CLI@v1
-        env:
-          MYSECRET: ${{ secrets.MYSECRET }}
-        with:
-          inlineScript: |
-            # Add the necessary deployment commands here using Azure CLI and Bicep
+      # Checkout code
+    - uses: actions/checkout@main
+    
+      # Log into Azure
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.MYSECRET }}
