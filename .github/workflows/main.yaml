@@ -18,7 +18,7 @@ jobs:
         uses: azure/setup-bicep@v1
 
       - name: Build and validate Bicep files
-        run: docker run --rm -v ${{ github.workspace }}:/workspace mcr.microsoft.com/azure-cli/bicep:latest build /workspace/main.bicep
+        run: bicep build main.bicep
 
   deploy:
     needs: build
@@ -36,4 +36,4 @@ jobs:
         env:
           MYSECRET: ${{ secrets.MYSECRET }}
         run: |
-          docker run --rm -v ${{ github.workspace }}:/workspace mcr.microsoft.com/azure-cli/bicep:latest build /workspace/main.bicep
+          bicep build main.bicep
