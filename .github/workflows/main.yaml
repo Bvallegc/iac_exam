@@ -8,18 +8,19 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Build and validate Bicep files
-        run: bicep build main.bicep
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/workspace mcr.microsoft.com/azure-cli bicep build /workspace/main.bicep
 
   deploy:
     needs: build
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
     steps:
@@ -30,5 +31,4 @@ jobs:
         env:
           MYSECRET: ${{ secrets.MYSECRET }}
         run: |
-          bicep build main.bicep
-          az deployment group create --resource-group <resource-group-name> --template-file main.json --parameters parameters.json
+          docker run --rm -v ${{ github.workspace }}:/workspace mcr.microsoft.com/azure-cli az deployment group create --resource-group <resource-group-name> --template-file /workspace/main.json --parameters /workspace/parameters.json
