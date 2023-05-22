@@ -8,29 +8,23 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Set up Bicep
-        uses: azure/setup-bicep@v1
 
       - name: Build and validate Bicep files
         run: bicep build main.bicep
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Set up Bicep
-        uses: azure/setup-bicep@v1
 
       - name: Deploy Bicep template
         env:
